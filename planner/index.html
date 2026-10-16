@@ -111,6 +111,7 @@ footer { margin-top: 32px; font-size: 12px; color: var(--muted); max-width: 80ch
   <nav class="tabs" role="tablist" aria-label="Planning tools">
     <button role="tab" id="tab-retirement" aria-controls="retirement" aria-selected="true">Will my money last?</button>
     <button role="tab" id="tab-accounts" aria-controls="accounts" aria-selected="false">Which account first?</button>
+    <button role="tab" id="tab-fees" aria-controls="fees" aria-selected="false">Fund costs</button>
     <button role="tab" id="tab-business" aria-controls="business" aria-selected="false">Business cash flow</button>
     <button role="tab" id="tab-roi" aria-controls="roi" aria-selected="false">Practice ROI</button>
     <button role="tab" id="tab-about" aria-controls="about" aria-selected="false">Methods &amp; industry tools</button>
@@ -168,6 +169,38 @@ footer { margin-top: 32px; font-size: 12px; color: var(--muted); max-width: 80ch
         <div class="canvas-wrap"><canvas id="c-acc" role="img" aria-label="Bar chart of after-tax value by account type"></canvas></div>
       </div>
       <p class="takeaway" id="t-acc"></p>
+    </div>
+  </section>
+
+  <!-- FUND COSTS -->
+  <section id="fees" role="tabpanel" aria-labelledby="tab-fees" class="panel" hidden>
+    <div class="inputs">
+      <h2>What's compared</h2>
+      <p class="hint" style="font-size:13px">The same client and portfolio from the first tab, built three ways. Only the funds' yearly expense ratios differ.</p>
+      <div class="table-scroll"><table>
+        <thead><tr><th>Role</th><th>Schwab ETF</th><th>Cost</th></tr></thead>
+        <tbody>
+          <tr><td>US stocks</td><td>SCHB</td><td class="num">0.03%</td></tr>
+          <tr><td>International</td><td>SCHF</td><td class="num">0.03%</td></tr>
+          <tr><td>US bonds</td><td>SCHZ</td><td class="num">0.03%</td></tr>
+          <tr><td>TIPS</td><td>SCHP</td><td class="num">0.03%</td></tr>
+        </tbody>
+      </table></div>
+      <p class="hint">Averages for comparison (ICI, 2025): index ETFs 0.14% stocks / 0.09% bonds; mutual funds 0.40% stocks / 0.36% bonds.</p>
+      <p class="hint">Sources: <a href="https://www.schwab.com/schwabetfs">Schwab ETF list</a> (as of June 19, 2026) · <a href="https://www.ici.org/news-release/mutual-fund-and-etf-fees-remained-near-historic-lows-in-2025">ICI fee report</a>. Change the client or portfolio on the first tab.</p>
+    </div>
+    <div class="results">
+      <div class="tiles">
+        <div class="tile"><span class="k">Schwab ETF blended cost</span><span class="v" id="k-er"></span><span class="s">per year, this portfolio</span></div>
+        <div class="tile"><span class="k">More at retirement</span><span class="v" id="k-vsmf"></span><span class="s">vs average mutual funds</span></div>
+        <div class="tile"><span class="k">More at retirement</span><span class="v" id="k-vsetf"></span><span class="s">vs average index ETFs</span></div>
+        <div class="tile"><span class="k">Money lasts to</span><span class="v" id="k-feelast"></span><span class="s" id="k-feelast-s"></span></div>
+      </div>
+      <div class="chartbox">
+        <h3>Balance at retirement by fund cost</h3>
+        <div class="canvas-wrap"><canvas id="c-fees" role="img" aria-label="Bar chart of balance at retirement for Schwab ETFs, average index ETFs and average mutual funds"></canvas></div>
+      </div>
+      <p class="takeaway" id="t-fees"></p>
     </div>
   </section>
 
@@ -236,6 +269,7 @@ footer { margin-top: 32px; font-size: 12px; color: var(--muted); max-width: 80ch
           <tr><td>Goal-based retirement projection</td><td class="yes">Yes</td><td class="yes">Yes</td></tr>
           <tr><td>Monte Carlo "probability of success"</td><td class="yes">Yes, 1,000 runs</td><td class="yes">Yes</td></tr>
           <tr><td>Live what-if sliders in a client meeting</td><td class="yes">Yes</td><td class="yes">Yes</td></tr>
+          <tr><td>Fund-cost comparison</td><td class="yes">Yes</td><td class="yes">Yes</td></tr>
           <tr><td>Account and tax strategy</td><td class="part">Core comparison</td><td class="yes">Detailed tax planning</td></tr>
           <tr><td>Business owner cash flow</td><td class="yes">Yes</td><td class="part">Varies by platform</td></tr>
           <tr><td>Practice revenue and client lifetime value</td><td class="yes">Yes</td><td class="no">Separate practice-management tools</td></tr>
@@ -250,11 +284,12 @@ footer { margin-top: 32px; font-size: 12px; color: var(--muted); max-width: 80ch
     <p><strong>Simulation.</strong> Each of 1,000 runs draws a random return every year from the portfolio's return and volatility. Probability of success is the share of runs where money lasts to age 92. The bad-luck case uses an approximate 10th-percentile return: expected return − 1.28 × volatility ÷ √30.</p>
     <p><strong>Accounts.</strong> The same pre-tax income goes into each account. Roth and taxable contributions are taxed first; Traditional and 401(k) withdrawals are taxed at the retirement rate; taxable accounts lose 0.5% a year to tax drag and pay 15% on gains.</p>
     <p><strong>Practice ROI.</strong> New clients = prospects × 12 × conversion. Clients and insured clients carry forward at the retention rate. Revenue = advisory fee on average assets + annuity commissions + life insurance first-year and renewal commissions. Client lifetime value is the NPV of 10 years of expected cash flow at an 8% discount rate.</p>
+    <p><strong>Fund costs.</strong> Each fund's expense ratio is weighted by the portfolio mix and subtracted from the return every year, on top of the 1% advisory fee. Schwab ETF ratios are from Schwab (as of June 19, 2026); comparison averages are ICI's 2025 asset-weighted figures.</p>
     <p><strong>Business.</strong> Customers × price, less 25% cost of service and fixed costs. Each simulated future has its own growth and churn rate plus month-to-month noise.</p>
     <p>The full Excel model and Python code are on GitHub at github.com/M-NOVA288.</p>
   </section>
 
-  <footer>Educational demo with illustrative assumptions; not investment, tax or legal advice. Not affiliated with any software vendor named here. Built by Monisa Nova.</footer>
+  <footer>Educational demo with illustrative assumptions; not investment, tax or legal advice. Not affiliated with any company or software vendor named here. Built by Monisa Nova.</footer>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
@@ -351,7 +386,7 @@ footer { margin-top: 32px; font-size: 12px; color: var(--muted); max-width: 80ch
       o.plugins.legend.labels.filter = l => !l.text.startsWith("_");
       o.plugins.tooltip.filter = c => !c.dataset.label.startsWith("_");
       o.scales.x.title = { display: true, text: "Age" }; return o; })() });
-    renderAcc(); renderRoi();
+    renderAcc(); renderFees(); renderRoi();
   }
 
   // ---------- accounts
@@ -431,6 +466,37 @@ footer { margin-top: 32px; font-size: 12px; color: var(--muted); max-width: 80ch
       clv += cf / Math.pow(1.08, t); }
     return { rev, aum3: pa, clients3: pc, clv, newPerYear: out.newPerYear };
   }
+  // ---------- fund costs
+  const COSTS = [
+    { label: "Schwab index ETFs", eq: 0.0003, bd: 0.0003 },
+    { label: "Average index ETFs", eq: 0.0014, bd: 0.0009 },
+    { label: "Average mutual funds", eq: 0.0040, bd: 0.0036 }];
+  const pct2 = v => (v * 100).toFixed(2) + "%";
+  function feeRun() {
+    const inp = retInputs(), pf = portfolio(), p = +$("r-port").value, t = +$("r-tips").value;
+    const eqW = (BASE[p][0] + BASE[p][1]) * (1 - t), bdW = BASE[p][2] * (1 - t) + t, n = inp.ret - inp.age;
+    return COSTS.map(c => { const er = eqW * c.eq + bdW * c.bd, r = pf.ret - er, pth = path(inp, () => r);
+      return { label: c.label, er, bal: pth.out[n - 1], last: pth.lastAge }; });
+  }
+  function renderFees() {
+    const [sch, idx, mf] = feeRun();
+    const lastTxt = a => a.last ? "Age " + a.last : "92+";
+    $("k-er").textContent = pct2(sch.er);
+    $("k-vsmf").textContent = "+" + short(sch.bal - mf.bal);
+    $("k-vsetf").textContent = "+" + short(sch.bal - idx.bal);
+    $("k-feelast").textContent = lastTxt(sch);
+    $("k-feelast-s").textContent = `Schwab ETFs; mutual funds: ${lastTxt(mf)}`;
+    $("t-fees").innerHTML = `<strong>${short(sch.bal - mf.bal)} more at retirement</strong> from a cost difference of `
+      + `${pct2(mf.er - sch.er)} a year. Small yearly costs compound over ${retInputs().ret - retInputs().age} years, `
+      + "so keeping fund costs low protects the plan without taking more risk.";
+    makeChart("c-fees", { type: "bar", data: { labels: [sch, idx, mf].map(a => `${a.label} (${pct2(a.er)})`), datasets: [
+      { label: "Balance at retirement", data: [sch.bal, idx.bal, mf.bal],
+        backgroundColor: [css("--series-1"), css("--muted"), css("--muted")], borderRadius: 4, barPercentage: .6 }] },
+      options: (() => { const o = baseOpts(short); o.indexAxis = "y"; o.plugins.legend.display = false;
+        o.interaction = { mode: "nearest", intersect: true };
+        o.scales = { x: { ticks: { callback: v => short(v) }, grid: { color: css("--line") } }, y: { grid: { display: false } } }; return o; })() });
+  }
+
   function renderRoi() {
     const pf = portfolio();
     const inp = { pros: +$("p-pros").value, aum: +$("p-aum").value, g: pf.ret + FEE };
@@ -474,8 +540,8 @@ footer { margin-top: 32px; font-size: 12px; color: var(--muted); max-width: 80ch
   }
   tabs.forEach(t => t.addEventListener("click", () => select(t.getAttribute("aria-controls"), true)));
   let start = (location.hash || "").slice(1);
-  if (!["retirement", "accounts", "business", "roi", "about"].includes(start)) { try { start = localStorage.getItem("planner-tab") || "retirement"; } catch (e) { start = "retirement"; } }
-  if (!["retirement", "accounts", "business", "roi", "about"].includes(start)) start = "retirement";
+  if (!["retirement", "accounts", "fees", "business", "roi", "about"].includes(start)) { try { start = localStorage.getItem("planner-tab") || "retirement"; } catch (e) { start = "retirement"; } }
+  if (!["retirement", "accounts", "fees", "business", "roi", "about"].includes(start)) start = "retirement";
 
   function renderAll() { if (!window.Chart) return; chartDefaults(); renderRet(); renderBus(); }
   select(start, false);

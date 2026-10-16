@@ -4,7 +4,7 @@ A formula-driven Excel model, built in the FMVA (Financial Modeling & Valuation 
 
 It projects a client's savings from today through retirement, compares 3 model ETF portfolios with 0%, 5% and 10% sleeves of inflation-protected bonds (TIPS), and stress-tests every combination against a bad-luck market.
 
-**Try it live:** [Client Planning Lab](https://m-nova288.github.io/retirement-stress-test-model-/planner/), an interactive version with sliders and a Monte Carlo probability of success. Or scan:
+**Try it live:** [Client Planning Lab](https://m-nova288.github.io/retirement-stress-test-model-/planner/), an interactive version with sliders and a Monte Carlo probability of success, plus a fund-cost comparison using Schwab ETF expense ratios. Or scan:
 
 <img src="planner_qr.png" alt="QR code to the Client Planning Lab" width="160">
 
