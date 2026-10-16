@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+html { color-scheme: light; }
+:root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+body { margin: 0; font-size: 14px; font-family: system-ui, sans-serif; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+</style>
+<title>Client Planning Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: planner's worksheet. Sticky tab strip, inputs panel left, results right; stacks to one column on phones. */
+:root {
+  --bg: #f6f7f5;
+  --surface: #ffffff;
+  --ink: #15201c;
+  --muted: #5b6862;
+  --line: #dde3df;
+  --accent: #0f6b5c;
+  --accent-soft: #e2f0ec;
+  --series-1: #2a78d6;
+  --series-2: #eb6834;
+  --series-3: #1baf7a;
+  --series-4: #eda100;
+  --good: #1a7f4b;
+  --warn: #b35c00;
+  --bad: #c0362c;
+  --font-display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", sans-serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --font-data: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #111816; --surface: #18211e; --ink: #e8eeeb; --muted: #9aa8a1; --line: #2a3632;
+  --accent: #4fc2a8; --accent-soft: #1d3530;
+  --series-1: #3987e5; --series-2: #d95926; --series-3: #199e70; --series-4: #c98500;
+  --good: #4cc488; --warn: #e89a3c; --bad: #ef6b60; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #111816; --surface: #18211e; --ink: #e8eeeb; --muted: #9aa8a1; --line: #2a3632;
+  --accent: #4fc2a8; --accent-soft: #1d3530;
+  --series-1: #3987e5; --series-2: #d95926; --series-3: #199e70; --series-4: #c98500;
+  --good: #4cc488; --warn: #e89a3c; --bad: #ef6b60; color-scheme: dark; }
+
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.5; }
+.wrap { max-width: 1120px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 28px 48px; }
+header.top { display: grid; gap: 6px; margin-bottom: 18px; }
+.eyebrow { font-family: var(--font-data); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+h1 { font-family: var(--font-display); font-size: clamp(28px, 4.5vw, 40px); line-height: 1.1; margin: 0; text-wrap: balance; }
+.lede { color: var(--muted); max-width: 64ch; margin: 0; }
+
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+nav.tabs { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); display: flex; gap: 6px; padding-block: 10px; border-bottom: 1px solid var(--line); margin-bottom: 22px; overflow-x: auto; }
+nav.tabs button { font: 600 14px var(--font-body); color: var(--muted); background: transparent; border: 1px solid transparent; border-radius: 999px; padding: 7px 14px; cursor: pointer; white-space: nowrap; }
+nav.tabs button[aria-selected="true"] { color: var(--accent); background: var(--accent-soft); border-color: var(--accent); }
+nav.tabs button:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.panel { display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr); gap: 24px; align-items: start; }
+@media (max-width: 820px) { .panel { grid-template-columns: minmax(0, 1fr); } }
+.inputs { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px; display: grid; gap: 14px; }
+.inputs h2, .results h2 { font: 600 13px var(--font-data); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 0; }
+.field { display: grid; gap: 4px; }
+.field label { display: flex; justify-content: space-between; gap: 8px; font-size: 13.5px; }
+.field label output { font-family: var(--font-data); font-variant-numeric: tabular-nums; color: var(--ink); }
+input[type="range"] { width: 100%; accent-color: var(--accent); }
+select { font: 14px var(--font-body); padding: 6px 8px; border-radius: 6px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); }
+.hint { font-size: 12px; color: var(--muted); }
+
+.results { display: grid; gap: 16px; min-width: 0; }
+.tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+@media (max-width: 1000px) { .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.tile { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; display: grid; gap: 2px; align-content: start; }
+.tile .k { font-size: 12px; color: var(--muted); }
+.tile .v { font: 600 22px var(--font-data); font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
+.tile .s { font-size: 12px; color: var(--muted); }
+.pill { display: inline-block; font: 600 11px var(--font-data); letter-spacing: .04em; text-transform: uppercase; padding: 2px 8px; border-radius: 999px; width: fit-content; border: 1px solid currentColor; }
+.pill.good { color: var(--good); } .pill.warn { color: var(--warn); } .pill.bad { color: var(--bad); }
+.chartbox { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px; }
+.chartbox h3 { font: 600 15px var(--font-body); margin: 0 0 8px; }
+.canvas-wrap { position: relative; height: 300px; }
+.takeaway { background: var(--accent-soft); border-left: 3px solid var(--accent); padding: 12px 14px; border-radius: 0 8px 8px 0; margin: 0; }
+.takeaway strong { color: var(--accent); }
+
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+.table-scroll { overflow-x: auto; }
+th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font: 600 12px var(--font-data); letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
+td.num { font-family: var(--font-data); font-variant-numeric: tabular-nums; text-align: right; }
+.yes { color: var(--good); font-weight: 600; } .part { color: var(--warn); font-weight: 600; } .no { color: var(--muted); }
+section.about { display: grid; gap: 14px; max-width: 860px; }
+section.about h2 { font-family: var(--font-display); font-size: 24px; margin: 8px 0 0; }
+section.about p { margin: 0; max-width: 68ch; }
+footer { margin-top: 32px; font-size: 12px; color: var(--muted); max-width: 80ch; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <header class="top">
+    <span class="eyebrow">Monisa Nova · FMVA candidate</span>
+    <h1>Client Planning Lab</h1>
+    <p class="lede">Three planning questions clients ask, answered live. Move the sliders to see how each decision changes the outcome. Example figures shown; replace them with any client's numbers.</p>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Planning tools">
+    <button role="tab" id="tab-retirement" aria-controls="retirement" aria-selected="true">Will my money last?</button>
+    <button role="tab" id="tab-accounts" aria-controls="accounts" aria-selected="false">Which account first?</button>
+    <button role="tab" id="tab-business" aria-controls="business" aria-selected="false">Business cash flow</button>
+    <button role="tab" id="tab-about" aria-controls="about" aria-selected="false">Methods &amp; industry tools</button>
+  </nav>
+
+  <!-- RETIREMENT -->
+  <section id="retirement" role="tabpanel" aria-labelledby="tab-retirement" class="panel">
+    <form class="inputs" id="f-ret" onsubmit="return false">
+      <h2>Client inputs</h2>
+      <div class="field"><label for="r-age">Current age <output id="o-age"></output></label><input type="range" id="r-age" min="25" max="60" step="1" value="35"></div>
+      <div class="field"><label for="r-ret">Retirement age <output id="o-ret"></output></label><input type="range" id="r-ret" min="55" max="75" step="1" value="65"></div>
+      <div class="field"><label for="r-sav">Saved today <output id="o-sav"></output></label><input type="range" id="r-sav" min="0" max="500000" step="5000" value="50000"></div>
+      <div class="field"><label for="r-con">Yearly contributions <output id="o-con"></output></label><input type="range" id="r-con" min="0" max="40000" step="500" value="12000"><span class="hint">Grows 3% a year with raises</span></div>
+      <div class="field"><label for="r-spend">Spending in retirement (today's $) <output id="o-spend"></output></label><input type="range" id="r-spend" min="25000" max="120000" step="1000" value="50000"></div>
+      <div class="field"><label for="r-ss">Social Security (today's $) <output id="o-ss"></output></label><input type="range" id="r-ss" min="0" max="50000" step="1000" value="24000"></div>
+      <div class="field"><label for="r-port">Portfolio</label>
+        <select id="r-port"><option value="0">Conservative (30/10/60)</option><option value="1" selected>Balanced (45/15/40)</option><option value="2">Growth (60/25/15)</option></select>
+        <span class="hint">US stocks / international / bonds</span></div>
+      <div class="field"><label for="r-tips">Inflation-protected bonds (TIPS) <output id="o-tips"></output></label><input type="range" id="r-tips" min="0" max="0.3" step="0.01" value="0.05"></div>
+    </form>
+    <div class="results">
+      <div class="tiles">
+        <div class="tile"><span class="k">Probability of success</span><span class="v" id="k-pos"></span><span class="pill" id="k-pos-pill"></span></div>
+        <div class="tile"><span class="k">Balance at retirement</span><span class="v" id="k-bal"></span><span class="s">expected case</span></div>
+        <div class="tile"><span class="k">Money lasts to</span><span class="v" id="k-last"></span><span class="s">expected case, plan to 92</span></div>
+        <div class="tile"><span class="k">Bad-luck case lasts to</span><span class="v" id="k-bad"></span><span class="s">~10th-percentile returns</span></div>
+      </div>
+      <div class="chartbox">
+        <h3>Portfolio balance by age: 1,000 simulated markets</h3>
+        <div class="canvas-wrap"><canvas id="c-ret" role="img" aria-label="Fan chart of simulated portfolio balance by age"></canvas></div>
+      </div>
+      <p class="takeaway" id="t-ret"></p>
+    </div>
+  </section>
+
+  <!-- ACCOUNTS -->
+  <section id="accounts" role="tabpanel" aria-labelledby="tab-accounts" class="panel" hidden>
+    <form class="inputs" id="f-acc" onsubmit="return false">
+      <h2>Tax inputs</h2>
+      <div class="field"><label for="a-amt">Pre-tax income set aside yearly <output id="o-amt"></output></label><input type="range" id="a-amt" min="1000" max="7500" step="250" value="7500"><span class="hint">2026 IRA limit is $7,500</span></div>
+      <div class="field"><label for="a-tnow">Tax rate now <output id="o-tnow"></output></label><input type="range" id="a-tnow" min="0.10" max="0.37" step="0.01" value="0.22"></div>
+      <div class="field"><label for="a-tret">Tax rate in retirement <output id="o-tret"></output></label><input type="range" id="a-tret" min="0.10" max="0.37" step="0.01" value="0.12"></div>
+      <div class="field"><label for="a-sal">Salary (for employer match) <output id="o-sal"></output></label><input type="range" id="a-sal" min="30000" max="200000" step="5000" value="75000"><span class="hint">Match: 50% on the first 6% of salary</span></div>
+      <p class="hint">Uses the age, retirement age and portfolio return from the first tab. Texas has no state income tax.</p>
+    </form>
+    <div class="results">
+      <div class="tiles">
+        <div class="tile"><span class="k">Best place for the next dollar</span><span class="v" id="k-best" style="font-size:17px"></span></div>
+        <div class="tile"><span class="k">Better IRA</span><span class="v" id="k-ira" style="font-size:17px"></span><span class="s" id="k-ira-s"></span></div>
+        <div class="tile"><span class="k">Gain vs taxable account</span><span class="v" id="k-gain"></span><span class="s">best IRA, after tax</span></div>
+        <div class="tile"><span class="k">Years of saving</span><span class="v" id="k-years"></span><span class="s" id="k-years-s"></span></div>
+      </div>
+      <div class="chartbox">
+        <h3>After-tax value at retirement</h3>
+        <div class="canvas-wrap"><canvas id="c-acc" role="img" aria-label="Bar chart of after-tax value by account type"></canvas></div>
+      </div>
+      <p class="takeaway" id="t-acc"></p>
+    </div>
+  </section>
+
+  <!-- BUSINESS -->
+  <section id="business" role="tabpanel" aria-labelledby="tab-business" class="panel" hidden>
+    <form class="inputs" id="f-bus" onsubmit="return false">
+      <h2>Example Co. (fictional)</h2>
+      <div class="field"><label for="b-cash">Starting cash <output id="o-cash"></output></label><input type="range" id="b-cash" min="50000" max="800000" step="10000" value="300000"></div>
+      <div class="field"><label for="b-price">Price change <output id="o-price"></output></label><input type="range" id="b-price" min="-0.2" max="0.3" step="0.01" value="0"><span class="hint">Base $150 per customer per month</span></div>
+      <div class="field"><label for="b-fixed">Fixed-cost change <output id="o-fixed"></output></label><input type="range" id="b-fixed" min="-0.3" max="0.3" step="0.01" value="0"><span class="hint">Base $45,000 a month</span></div>
+      <div class="field"><label for="b-grow">New customers per month <output id="o-grow"></output></label><input type="range" id="b-grow" min="0" max="0.1" step="0.005" value="0.05"></div>
+      <div class="field"><label for="b-churn">Customers lost per month <output id="o-churn"></output></label><input type="range" id="b-churn" min="0" max="0.08" step="0.005" value="0.02"></div>
+      <p class="hint">Starts with 250 customers; cost of service is 25% of revenue.</p>
+    </form>
+    <div class="results">
+      <div class="tiles">
+        <div class="tile"><span class="k">Chance cash lasts 24 months</span><span class="v" id="k-surv"></span><span class="pill" id="k-surv-pill"></span></div>
+        <div class="tile"><span class="k">Breakeven month</span><span class="v" id="k-be"></span><span class="s">plan case</span></div>
+        <div class="tile"><span class="k">Cash runs out</span><span class="v" id="k-run"></span><span class="s">plan case</span></div>
+        <div class="tile"><span class="k">Cash at month 24</span><span class="v" id="k-end"></span><span class="s">plan case</span></div>
+      </div>
+      <div class="chartbox">
+        <h3>Cash balance: plan vs 1,000 simulated futures</h3>
+        <div class="canvas-wrap"><canvas id="c-bus" role="img" aria-label="Line chart of business cash balance by month"></canvas></div>
+      </div>
+      <p class="takeaway" id="t-bus"></p>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about" role="tabpanel" aria-labelledby="tab-about" class="about" hidden>
+    <h2>How this compares to industry planning software</h2>
+    <p>Advisory firms license planning platforms such as <strong>MoneyGuidePro</strong>, <strong>eMoney</strong> and <strong>RightCapital</strong> to run these conversations with clients. This lab rebuilds the core methods behind them from scratch, to show I understand how the numbers work, not just how to read the output.</p>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Capability</th><th>This lab</th><th>Industry platforms</th></tr></thead>
+        <tbody>
+          <tr><td>Goal-based retirement projection</td><td class="yes">Yes</td><td class="yes">Yes</td></tr>
+          <tr><td>Monte Carlo "probability of success"</td><td class="yes">Yes, 1,000 runs</td><td class="yes">Yes</td></tr>
+          <tr><td>Live what-if sliders in a client meeting</td><td class="yes">Yes</td><td class="yes">Yes</td></tr>
+          <tr><td>Account and tax strategy</td><td class="part">Core comparison</td><td class="yes">Detailed tax planning</td></tr>
+          <tr><td>Business owner cash flow</td><td class="yes">Yes</td><td class="part">Varies by platform</td></tr>
+          <tr><td>Linking clients' real accounts</td><td class="no">No</td><td class="yes">Yes</td></tr>
+          <tr><td>Client portal and compliance-ready reports</td><td class="no">No</td><td class="yes">Yes</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h2>Methods</h2>
+    <p><strong>Portfolio math.</strong> Expected return is the weighted average of each asset class; risk comes from a correlation matrix converted to covariance (w′Σw). Example ETFs: VTI, VXUS, BND and SCHP. A 1% advisory fee is deducted.</p>
+    <p><strong>Projection.</strong> Contributions grow 3% a year until retirement. Withdrawals cover spending minus Social Security and rise with 2.5% inflation.</p>
+    <p><strong>Simulation.</strong> Each of 1,000 runs draws a random return every year from the portfolio's return and volatility. Probability of success is the share of runs where money lasts to age 92. The bad-luck case uses an approximate 10th-percentile return: expected return − 1.28 × volatility ÷ √30.</p>
+    <p><strong>Accounts.</strong> The same pre-tax income goes into each account. Roth and taxable contributions are taxed first; Traditional and 401(k) withdrawals are taxed at the retirement rate; taxable accounts lose 0.5% a year to tax drag and pay 15% on gains.</p>
+    <p><strong>Business.</strong> Customers × price, less 25% cost of service and fixed costs. Each simulated future has its own growth and churn rate plus month-to-month noise.</p>
+    <p>The full Excel model and Python code are on GitHub at github.com/M-NOVA288.</p>
+  </section>
+
+  <footer>Educational demo with illustrative assumptions; not investment, tax or legal advice. Not affiliated with any software vendor named here. Built by Monisa Nova.</footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const money = v => (v < 0 ? "−$" : "$") + Math.round(Math.abs(v)).toLocaleString("en-US");
+  const short = v => { const a = Math.abs(v), s = v < 0 ? "−$" : "$";
+    return a >= 1e6 ? s + (a / 1e6).toFixed(2) + "M" : a >= 1e3 ? s + Math.round(a / 1e3) + "K" : s + Math.round(a); };
+  const pct = v => (v * 100).toFixed(v * 100 % 1 ? 1 : 0) + "%";
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+  // seeded random normals so results stay steady while sliders move
+  function rng(seed) { let a = seed >>> 0; return () => { a += 0x6D2B79F5; let t = a;
+    t = Math.imul(t ^ t >>> 15, t | 1); t ^= t + Math.imul(t ^ t >>> 7, t | 61); return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+  function normals(seed) { const r = rng(seed); return () => { let u = 0, v = 0;
+    while (u === 0) u = r(); v = r(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); }; }
+  const quant = (arr, q) => { const s = [...arr].sort((a, b) => a - b); const i = (s.length - 1) * q, lo = Math.floor(i);
+    return s[lo] + (s[Math.min(lo + 1, s.length - 1)] - s[lo]) * (i - lo); };
+
+  // ---------- capital market assumptions (same as the Excel model)
+  const R = [0.07, 0.065, 0.04, 0.038], V = [0.16, 0.18, 0.06, 0.055];
+  const C = [[1, .8, .1, .1], [.8, 1, .1, .1], [.1, .1, 1, .7], [.1, .1, .7, 1]];
+  const BASE = [[.30, .10, .60], [.45, .15, .40], [.60, .25, .15]];
+  const FEE = 0.01, G = 0.03, INF = 0.025, PLAN = 92, RUNS = 1000;
+
+  const charts = {};
+  function chartDefaults() {
+    Chart.defaults.font.family = css("--font-body"); Chart.defaults.color = css("--muted");
+    Chart.defaults.borderColor = css("--line");
+  }
+  function makeChart(id, cfg) { if (charts[id]) charts[id].destroy(); charts[id] = new Chart($(id), cfg); }
+  const baseOpts = (yFmt) => ({
+    responsive: true, maintainAspectRatio: false, animation: false,
+    interaction: { mode: "index", intersect: false },
+    plugins: { legend: { position: "bottom", labels: { boxWidth: 12, boxHeight: 12, color: css("--ink") } },
+      tooltip: { callbacks: { label: c => ` ${c.dataset.label}: ${yFmt(c.parsed.y ?? c.parsed.x)}` } } },
+    scales: { y: { ticks: { callback: v => yFmt(v) }, grid: { color: css("--line") } },
+      x: { grid: { display: false } } }
+  });
+
+  function bind(ids, fmt, fn) { ids.forEach((id, i) => { const el = $(id);
+    const show = () => { $("o-" + id.split("-")[1]).textContent = fmt[i](+el.value); };
+    el.addEventListener("input", () => { show(); fn(); }); show(); }); }
+
+  // ---------- retirement
+  function portfolio() {
+    const p = +$("r-port").value, t = +$("r-tips").value;
+    const w = [...BASE[p].map(x => x * (1 - t)), t];
+    let ret = 0, varr = 0;
+    for (let i = 0; i < 4; i++) { ret += w[i] * R[i]; for (let j = 0; j < 4; j++) varr += w[i] * w[j] * V[i] * V[j] * C[i][j]; }
+    return { ret: ret - FEE, vol: Math.sqrt(varr) };
+  }
+  function retInputs() {
+    let age = +$("r-age").value, ret = Math.max(+$("r-ret").value, age + 1);
+    return { age, ret, sav: +$("r-sav").value, con: +$("r-con").value, spend: +$("r-spend").value, ss: +$("r-ss").value };
+  }
+  function path(inp, returns) { // returns: function(yearIndex) -> return
+    const n = inp.ret - inp.age, W = Math.max(inp.spend - inp.ss, 0) * Math.pow(1 + INF, n);
+    let b = inp.sav; const out = []; let lastAge = null;
+    for (let a = inp.age + 1, t = 1; a <= PLAN; a++, t++) {
+      const r = returns(t - 1);
+      b = b * (1 + r) + (a <= inp.ret ? inp.con * Math.pow(1 + G, t - 1) : 0) - (a > inp.ret ? W * Math.pow(1 + INF, a - inp.ret - 1) : 0);
+      out.push(b); if (b < 0 && lastAge === null) lastAge = a;
+    }
+    return { out, lastAge };
+  }
+  function renderRet() {
+    const inp = retInputs(), pf = portfolio(), n = inp.ret - inp.age;
+    const ages = []; for (let a = inp.age + 1; a <= PLAN; a++) ages.push(a);
+    const exp = path(inp, () => pf.ret);
+    const badR = pf.ret - 1.28 * pf.vol / Math.sqrt(30);
+    const bad = path(inp, () => badR);
+    const z = normals(20261016); let ok = 0; const runs = [];
+    for (let k = 0; k < RUNS; k++) { const p = path(inp, () => pf.ret + pf.vol * z()); runs.push(p.out); if (p.lastAge === null) ok++; }
+    const pos = ok / RUNS;
+    const band = q => ages.map((_, i) => Math.max(0, quant(runs.map(r => r[i]), q)));
+    $("k-pos").textContent = Math.round(pos * 100) + "%";
+    const pill = $("k-pos-pill"); pill.className = "pill " + (pos >= .8 ? "good" : pos >= .6 ? "warn" : "bad");
+    pill.textContent = pos >= .8 ? "On track" : pos >= .6 ? "Needs attention" : "At risk";
+    $("k-bal").textContent = short(exp.out[n - 1]);
+    $("k-last").textContent = exp.lastAge ? "Age " + exp.lastAge : "92+";
+    $("k-bad").textContent = bad.lastAge ? "Age " + bad.lastAge : "92+";
+    $("t-ret").innerHTML = `<strong>${Math.round(pos * 100)}% of simulated markets</strong> keep this plan funded to age 92. `
+      + (pos >= .8 ? "The plan holds up well; review it each year."
+         : "To raise it, try saving more, retiring a year or two later, or covering part of spending with guaranteed income. Changing the portfolio mix alone moves it far less.");
+    const s1 = css("--series-1"), s2 = css("--series-2");
+    makeChart("c-ret", { type: "line", data: { labels: ages, datasets: [
+      { label: "10th–90th percentile", data: band(.9), borderWidth: 0, pointRadius: 0, backgroundColor: s1 + "26", fill: "+1" },
+      { label: "_low", data: band(.1), borderWidth: 0, pointRadius: 0, fill: false },
+      { label: "Median simulated", data: band(.5), borderColor: s1, borderWidth: 2, pointRadius: 0 },
+      { label: "Bad-luck case", data: bad.out.map(v => Math.max(0, v)), borderColor: s2, borderWidth: 2, borderDash: [5, 4], pointRadius: 0 }
+    ] }, options: (() => { const o = baseOpts(short);
+      o.plugins.legend.labels.filter = l => !l.text.startsWith("_");
+      o.plugins.tooltip.filter = c => !c.dataset.label.startsWith("_");
+      o.scales.x.title = { display: true, text: "Age" }; return o; })() });
+    renderAcc();
+  }
+
+  // ---------- accounts
+  function renderAcc() {
+    const inp = retInputs(), pf = portfolio(), n = inp.ret - inp.age, r = pf.ret;
+    const amt = +$("a-amt").value, tn = +$("a-tnow").value, tr = +$("a-tret").value, sal = +$("a-sal").value;
+    const fv = rate => Math.abs(rate - G) < 1e-6 ? n * Math.pow(1 + rate, n - 1) : (Math.pow(1 + rate, n) - Math.pow(1 + G, n)) / (rate - G);
+    const basis = (Math.pow(1 + G, n) - 1) / G, match = 0.5 * Math.min(amt, 0.06 * sal);
+    const taxB = amt * (1 - tn) * fv(r - 0.005), taxable = taxB - 0.15 * (taxB - amt * (1 - tn) * basis);
+    const trad = amt * fv(r) * (1 - tr), roth = amt * (1 - tn) * fv(r), k401 = (amt + match) * fv(r) * (1 - tr);
+    const rows = [["401(k) with match", k401], ["Traditional IRA", trad], ["Roth IRA", roth], ["Taxable account", taxable]];
+    const best = rows.reduce((a, b) => b[1] > a[1] ? b : a);
+    const ira = Math.abs(trad - roth) < 1 ? "Tie" : trad > roth ? "Traditional" : "Roth";
+    $("k-best").textContent = best[0];
+    $("k-ira").textContent = ira;
+    $("k-ira-s").textContent = ira === "Tie" ? "same tax rate now and later" : (ira === "Roth" ? "tax rate rises in retirement" : "tax rate drops in retirement");
+    $("k-gain").textContent = short(Math.max(trad, roth) - taxable);
+    $("k-years").textContent = n; $("k-years-s").textContent = `age ${inp.age} to ${inp.ret}`;
+    $("t-acc").innerHTML = `<strong>Capture the employer match first</strong>; it adds ${short(k401 - trad)} over a Traditional IRA here. `
+      + `Then choose ${ira === "Roth" ? "a Roth IRA, because the tax rate is higher in retirement" : ira === "Traditional" ? "a Traditional IRA, because the tax rate is lower in retirement" : "either IRA; they tie when the tax rate stays the same"}.`;
+    const cols = [css("--series-1"), css("--series-1"), css("--series-1"), css("--muted")];
+    makeChart("c-acc", { type: "bar", data: { labels: rows.map(x => x[0]), datasets: [
+      { label: "After-tax value at retirement", data: rows.map(x => x[1]), backgroundColor: cols, borderRadius: 4, barPercentage: .6 }] },
+      options: (() => { const o = baseOpts(short); o.indexAxis = "y"; o.plugins.legend.display = false;
+        o.interaction = { mode: "nearest", intersect: true };
+        o.scales = { x: { ticks: { callback: v => short(v) }, grid: { color: css("--line") } }, y: { grid: { display: false } } }; return o; })() });
+  }
+
+  // ---------- business
+  function renderBus() {
+    const cash0 = +$("b-cash").value, dp = +$("b-price").value, df = +$("b-fixed").value, g = +$("b-grow").value, ch = +$("b-churn").value;
+    const price = 150 * (1 + dp), fixed = 45000 * (1 + df), M = 24;
+    const run = (gs, cs) => { let cust = 250, cash = cash0; const out = [], prof = [];
+      for (let m = 0; m < M; m++) { cust *= 1 + gs(m) - cs; const rev = cust * price, p = rev - (rev * 0.25 + fixed);
+        cash += p; out.push(cash); prof.push(p); } return { out, prof }; };
+    const plan = run(() => g, ch);
+    const z = normals(42); let ok = 0; const runs = [];
+    for (let k = 0; k < RUNS; k++) { const gr = g + 0.015 * z(), cr = Math.max(0, ch + 0.005 * z());
+      const p = run(() => Math.max(0, gr + 0.01 * z()), cr); runs.push(p.out); if (p.out.every(v => v >= 0)) ok++; }
+    const surv = ok / RUNS, months = Array.from({ length: M }, (_, i) => i + 1);
+    const be = plan.prof.findIndex(p => p >= 0), out = plan.out.findIndex(c => c < 0);
+    $("k-surv").textContent = Math.round(surv * 100) + "%";
+    const pill = $("k-surv-pill"); pill.className = "pill " + (surv >= .9 ? "good" : surv >= .7 ? "warn" : "bad");
+    pill.textContent = surv >= .9 ? "Strong" : surv >= .7 ? "Build a reserve" : "At risk";
+    $("k-be").textContent = be < 0 ? "Not yet" : "Month " + (be + 1);
+    $("k-run").textContent = out < 0 ? "No" : "Month " + (out + 1);
+    $("k-end").textContent = short(plan.out[M - 1]);
+    $("t-bus").innerHTML = `<strong>About ${Math.round((1 - surv) * 10)} in 10</strong> simulated futures run out of cash within two years. `
+      + (surv >= .9 ? "The plan has a healthy cushion." : "A cash reserve or a line of credit, plus a downturn plan, would protect the business.");
+    const band = q => months.map((_, i) => quant(runs.map(r => r[i]), q));
+    const s1 = css("--series-1"), s3 = css("--series-3");
+    makeChart("c-bus", { type: "line", data: { labels: months, datasets: [
+      { label: "10th–90th percentile", data: band(.9), borderWidth: 0, pointRadius: 0, backgroundColor: s1 + "26", fill: "+1" },
+      { label: "_low", data: band(.1), borderWidth: 0, pointRadius: 0, fill: false },
+      { label: "Plan case", data: plan.out, borderColor: s3, borderWidth: 2, pointRadius: 0 },
+      { label: "Median simulated", data: band(.5), borderColor: s1, borderWidth: 2, borderDash: [5, 4], pointRadius: 0 }
+    ] }, options: (() => { const o = baseOpts(short);
+      o.plugins.legend.labels.filter = l => !l.text.startsWith("_");
+      o.plugins.tooltip.filter = c => !c.dataset.label.startsWith("_");
+      o.scales.x.title = { display: true, text: "Month" }; return o; })() });
+  }
+
+  // ---------- wiring
+  const yrs = v => v, usd = v => money(v), p0 = v => pct(v), sgn = v => (v > 0 ? "+" : "") + pct(v);
+  bind(["r-age", "r-ret", "r-sav", "r-con", "r-spend", "r-ss", "r-tips"], [yrs, yrs, usd, usd, usd, usd, p0], renderRet);
+  $("r-port").addEventListener("change", renderRet);
+  bind(["a-amt", "a-tnow", "a-tret", "a-sal"], [usd, p0, p0, usd], renderAcc);
+  bind(["b-cash", "b-price", "b-fixed", "b-grow", "b-churn"], [usd, sgn, sgn, p0, p0], renderBus);
+
+  const tabs = [...document.querySelectorAll('[role="tab"]')];
+  function select(id, push) {
+    tabs.forEach(t => { const on = t.getAttribute("aria-controls") === id; t.setAttribute("aria-selected", on); $(t.getAttribute("aria-controls")).hidden = !on; });
+    try { localStorage.setItem("planner-tab", id); } catch (e) {}
+    if (push) { try { history.replaceState(null, "", "#" + id); } catch (e) {} }
+    Object.values(charts).forEach(c => c.resize());
+  }
+  tabs.forEach(t => t.addEventListener("click", () => select(t.getAttribute("aria-controls"), true)));
+  let start = (location.hash || "").slice(1);
+  if (!["retirement", "accounts", "business", "about"].includes(start)) { try { start = localStorage.getItem("planner-tab") || "retirement"; } catch (e) { start = "retirement"; } }
+  if (!["retirement", "accounts", "business", "about"].includes(start)) start = "retirement";
+
+  function renderAll() { if (!window.Chart) return; chartDefaults(); renderRet(); renderBus(); }
+  select(start, false);
+  renderAll();
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", renderAll);
+  new MutationObserver(renderAll).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+})();
+</script>
+
+</body>
+</html>
