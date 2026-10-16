@@ -143,3 +143,44 @@ fig.text(0.01, 0.005, "Fictional business with made-up numbers, for demonstratio
 fig.tight_layout(rect=(0, 0.02, 1, 1))
 fig.savefig("business_cashflow.png", dpi=150, facecolor=SURF)
 print("saved business_cashflow.png")
+
+# ---------------------------------------------------------------- Practice ROI chart
+pr = wb["Practice ROI"]
+AQUA = "#1baf7a"
+fees = [[pr.cell(28, c).value for c in cols] for cols in ((2, 3, 4), (5, 6, 7))]
+ann = [[pr.cell(29, c).value for c in cols] for cols in ((2, 3, 4), (5, 6, 7))]
+ins = [[pr.cell(30, c).value + pr.cell(31, c).value for c in cols] for cols in ((2, 3, 4), (5, 6, 7))]
+cost = pr["B19"].value
+tot3 = (pr["B38"].value, pr["C38"].value)
+
+fig, ax = plt.subplots(figsize=(10, 6), facecolor=SURF)
+ax.set_facecolor(SURF)
+for side in ("top", "right"):
+    ax.spines[side].set_visible(False)
+ax.spines["left"].set_color("#cccccc"); ax.spines["bottom"].set_color("#cccccc")
+ax.tick_params(colors=MUTED); ax.grid(axis="y", color="#e6e6e3", linewidth=0.8); ax.set_axisbelow(True)
+ax.yaxis.set_major_formatter(kfmt)
+w = 0.36
+for si, (off, lab) in enumerate(((-w / 2 - 0.02, "Standard"), (w / 2 + 0.02, "Data-driven"))):
+    xs = [i + off for i in range(3)]
+    b1 = ax.bar(xs, fees[si], w, color=BLUE, label="Advisory fees" if si == 0 else None, edgecolor=SURF, linewidth=1.5)
+    b2 = ax.bar(xs, ann[si], w, bottom=fees[si], color=ORANGE, label="Annuity commissions" if si == 0 else None,
+                edgecolor=SURF, linewidth=1.5)
+    bottoms = [f + a for f, a in zip(fees[si], ann[si])]
+    ax.bar(xs, ins[si], w, bottom=bottoms, color=AQUA, label="Insurance commissions" if si == 0 else None,
+           edgecolor=SURF, linewidth=1.5)
+    for x, f, a, n in zip(xs, fees[si], ann[si], ins[si]):
+        ax.text(x, f + a + n + 1500, f"${(f + a + n)/1e3:,.0f}K", ha="center", color=INK, fontsize=9)
+        ax.text(x, -6500, lab, ha="center", color=MUTED, fontsize=8)
+ax.axhline(cost, color=INK, linewidth=1, linestyle="--")
+ax.text(-0.45, cost + 1500, "Planner cost \\$45K/yr", color=INK, fontsize=9, ha="left")
+ax.set_xticks(range(3)); ax.set_xticklabels(["Year 1", "Year 2", "Year 3"], color=INK)
+ax.tick_params(axis="x", pad=18)
+ax.set_ylim(-9000, max(f + a + n for f, a, n in zip(fees[1], ann[1], ins[1])) * 1.15)
+ax.set_title(f"Revenue from one new planner: \\${tot3[0]/1e3:,.0f}K standard vs \\${tot3[1]/1e3:,.0f}K data-driven over 3 years",
+             loc="left", color=INK, fontsize=12, fontweight="bold")
+ax.legend(frameon=False, loc="upper left", labelcolor=INK, fontsize=9)
+fig.text(0.01, 0.005, "Illustrative assumptions; replace with the firm's figures.", color=MUTED, fontsize=8)
+fig.tight_layout(rect=(0, 0.02, 1, 1))
+fig.savefig("practice_roi.png", dpi=150, facecolor=SURF)
+print("saved practice_roi.png")

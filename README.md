@@ -64,6 +64,24 @@ A fictional small business, **Example Co.** (made-up numbers), modeled the way a
 
 **Key insight:** cutting fixed costs reaches breakeven 3 months sooner and leaves the most cash, while a downturn drains cash within 14 months. About 1 in 8 simulated futures runs out of money, which is why a business owner needs a cash reserve and a downturn plan, not just a growth plan.
 
+## Practice ROI: how planning work turns into firm revenue
+
+How one new planner's client work becomes revenue for the firm: prospects → new clients → retained clients → assets under management, earning advisory fees, annuity commissions and life insurance commissions. It compares a **standard approach** with a **data-driven approach** (stress test and live planner in client meetings) that lifts conversion, retention and product take-up.
+
+![Practice ROI](practice_roi.png)
+
+| 3-year result | Standard | Data-driven | Difference |
+|---|---|---|---|
+| Total revenue | $155K | $236K | +$81K (+52%) |
+| Net contribution after planner cost | $20K | $101K | +$81K |
+| Clients at end of year 3 | 100 | 137 | +37 |
+| Assets under management, year 3 | $4.7M | $6.4M | +$1.8M |
+| Client lifetime value (10-year NPV at 8%) | $4.4K | $5.1K | +$0.7K |
+
+**Key insight:** with identical prospects, the standard planner doesn't cover their $45K cost until year 2, while the data-driven planner is profitable in year 1. The gain comes from clients who see a clear reason to act and stay because they understand their plan.
+
+Assumptions: 20 prospects a month; conversion 15% vs 20%; retention 92% vs 95%; $33K average assets per new client (Increase Consultants averages about $32.9K, per AdvizorPro); annuity take-up 20% vs 25% at $50K premium and 5% commission; life insurance take-up 25% vs 30% at $1,500 premium, 80% first-year and 5% renewal commission. All are illustrative and editable in the workbook.
+
 ## How it's built
 
 | Sheet | What it does |
@@ -74,6 +92,7 @@ A fictional small business, **Example Co.** (made-up numbers), modeled the way a
 | **Projection** | Year-by-year cash flow for the selected scenario: contributions growing with raises, inflation-adjusted withdrawals net of Social Security |
 | **Business Cash Flow** | 24-month driver model for a fictional business: 4 what-if scenarios in live formulas, runway and breakeven |
 | **Simulation** | 1,000-run Monte Carlo of growth and churn: cash percentiles by month, chance of staying cash-positive |
+| **Practice ROI** | Planner funnel to firm revenue over 3 years, standard vs data-driven, plus a 10-year client lifetime value DCF (Excel NPV) |
 | **Account Comparison** | Taxable vs Traditional IRA vs Roth IRA vs 401(k) with match: after-tax value at retirement, plus a Roth-vs-Traditional sensitivity across retirement tax rates |
 
 FMVA practices used:
@@ -92,6 +111,7 @@ Bad-luck case = net return − 1.28 × volatility ÷ √30, an approximation of 
 pip install openpyxl matplotlib numpy
 python build_model.py         # writes retirement_stress_test_model.xlsx
 python business_cashflow.py   # adds the business model and Monte Carlo sheets
+python practice_roi.py        # adds the Practice ROI sheet
 # open in Excel (formulas calculate on open), or recalculate with LibreOffice
 python make_chart.py          # redraws all chart images from the calculated workbook
 ```

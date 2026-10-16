@@ -112,6 +112,7 @@ footer { margin-top: 32px; font-size: 12px; color: var(--muted); max-width: 80ch
     <button role="tab" id="tab-retirement" aria-controls="retirement" aria-selected="true">Will my money last?</button>
     <button role="tab" id="tab-accounts" aria-controls="accounts" aria-selected="false">Which account first?</button>
     <button role="tab" id="tab-business" aria-controls="business" aria-selected="false">Business cash flow</button>
+    <button role="tab" id="tab-roi" aria-controls="roi" aria-selected="false">Practice ROI</button>
     <button role="tab" id="tab-about" aria-controls="about" aria-selected="false">Methods &amp; industry tools</button>
   </nav>
 
@@ -196,6 +197,34 @@ footer { margin-top: 32px; font-size: 12px; color: var(--muted); max-width: 80ch
     </div>
   </section>
 
+  <!-- PRACTICE ROI -->
+  <section id="roi" role="tabpanel" aria-labelledby="tab-roi" class="panel" hidden>
+    <form class="inputs" id="f-roi" onsubmit="return false">
+      <h2>Planner funnel</h2>
+      <div class="field"><label for="p-pros">Prospects met per month <output id="o-pros"></output></label><input type="range" id="p-pros" min="5" max="50" step="1" value="20"></div>
+      <div class="field"><label for="p-conv">Conversion, standard <output id="o-conv"></output></label><input type="range" id="p-conv" min="0.05" max="0.4" step="0.01" value="0.15"></div>
+      <div class="field"><label for="p-convd">Conversion, data-driven <output id="o-convd"></output></label><input type="range" id="p-convd" min="0.05" max="0.4" step="0.01" value="0.20"><span class="hint">Stress test and live planner give a clear reason to act</span></div>
+      <div class="field"><label for="p-retn">Retention, standard <output id="o-retn"></output></label><input type="range" id="p-retn" min="0.8" max="0.99" step="0.01" value="0.92"></div>
+      <div class="field"><label for="p-retd">Retention, data-driven <output id="o-retd"></output></label><input type="range" id="p-retd" min="0.8" max="0.99" step="0.01" value="0.95"></div>
+      <div class="field"><label for="p-aum">Assets per new client <output id="o-aum"></output></label><input type="range" id="p-aum" min="10000" max="250000" step="1000" value="33000"><span class="hint">Increase Consultants averages about $33K</span></div>
+      <div class="field"><label for="p-cost">Planner cost per year <output id="o-cost"></output></label><input type="range" id="p-cost" min="25000" max="90000" step="1000" value="45000"></div>
+      <p class="hint">Annuity take-up 20% vs 25% ($50K premium, 5% commission). Life insurance take-up 25% vs 30% ($1,500 premium, 80% first-year, 5% renewal). Fee and growth come from the first tab. Illustrative; replace with the firm's figures.</p>
+    </form>
+    <div class="results">
+      <div class="tiles">
+        <div class="tile"><span class="k">Extra revenue, 3 years</span><span class="v" id="k-up"></span><span class="s" id="k-up-s"></span></div>
+        <div class="tile"><span class="k">Year-1 net to firm</span><span class="v" id="k-y1"></span><span class="s" id="k-y1-s"></span></div>
+        <div class="tile"><span class="k">Extra assets managed, year 3</span><span class="v" id="k-aumx"></span><span class="s">data-driven vs standard</span></div>
+        <div class="tile"><span class="k">Client lifetime value</span><span class="v" id="k-clv"></span><span class="s" id="k-clv-s"></span></div>
+      </div>
+      <div class="chartbox">
+        <h3>Revenue from one new planner by year</h3>
+        <div class="canvas-wrap"><canvas id="c-roi" role="img" aria-label="Bar chart of revenue by year, standard versus data-driven, with planner cost line"></canvas></div>
+      </div>
+      <p class="takeaway" id="t-roi"></p>
+    </div>
+  </section>
+
   <!-- ABOUT -->
   <section id="about" role="tabpanel" aria-labelledby="tab-about" class="about" hidden>
     <h2>How this compares to industry planning software</h2>
@@ -209,6 +238,7 @@ footer { margin-top: 32px; font-size: 12px; color: var(--muted); max-width: 80ch
           <tr><td>Live what-if sliders in a client meeting</td><td class="yes">Yes</td><td class="yes">Yes</td></tr>
           <tr><td>Account and tax strategy</td><td class="part">Core comparison</td><td class="yes">Detailed tax planning</td></tr>
           <tr><td>Business owner cash flow</td><td class="yes">Yes</td><td class="part">Varies by platform</td></tr>
+          <tr><td>Practice revenue and client lifetime value</td><td class="yes">Yes</td><td class="no">Separate practice-management tools</td></tr>
           <tr><td>Linking clients' real accounts</td><td class="no">No</td><td class="yes">Yes</td></tr>
           <tr><td>Client portal and compliance-ready reports</td><td class="no">No</td><td class="yes">Yes</td></tr>
         </tbody>
@@ -219,6 +249,7 @@ footer { margin-top: 32px; font-size: 12px; color: var(--muted); max-width: 80ch
     <p><strong>Projection.</strong> Contributions grow 3% a year until retirement. Withdrawals cover spending minus Social Security and rise with 2.5% inflation.</p>
     <p><strong>Simulation.</strong> Each of 1,000 runs draws a random return every year from the portfolio's return and volatility. Probability of success is the share of runs where money lasts to age 92. The bad-luck case uses an approximate 10th-percentile return: expected return − 1.28 × volatility ÷ √30.</p>
     <p><strong>Accounts.</strong> The same pre-tax income goes into each account. Roth and taxable contributions are taxed first; Traditional and 401(k) withdrawals are taxed at the retirement rate; taxable accounts lose 0.5% a year to tax drag and pay 15% on gains.</p>
+    <p><strong>Practice ROI.</strong> New clients = prospects × 12 × conversion. Clients and insured clients carry forward at the retention rate. Revenue = advisory fee on average assets + annuity commissions + life insurance first-year and renewal commissions. Client lifetime value is the NPV of 10 years of expected cash flow at an 8% discount rate.</p>
     <p><strong>Business.</strong> Customers × price, less 25% cost of service and fixed costs. Each simulated future has its own growth and churn rate plus month-to-month noise.</p>
     <p>The full Excel model and Python code are on GitHub at github.com/M-NOVA288.</p>
   </section>
@@ -320,7 +351,7 @@ footer { margin-top: 32px; font-size: 12px; color: var(--muted); max-width: 80ch
       o.plugins.legend.labels.filter = l => !l.text.startsWith("_");
       o.plugins.tooltip.filter = c => !c.dataset.label.startsWith("_");
       o.scales.x.title = { display: true, text: "Age" }; return o; })() });
-    renderAcc();
+    renderAcc(); renderRoi();
   }
 
   // ---------- accounts
@@ -383,12 +414,56 @@ footer { margin-top: 32px; font-size: 12px; color: var(--muted); max-width: 80ch
       o.scales.x.title = { display: true, text: "Month" }; return o; })() });
   }
 
+
+  // ---------- practice ROI
+  function roiRun(conv, ret, ann, life, inp) {
+    const g = inp.g, fee = FEE; let pc = 0, pi = 0, pa = 0; const rev = [], out = {};
+    for (let y = 0; y < 3; y++) {
+      const nw = inp.pros * 12 * conv, c = pc * ret + nw, ins = pi * ret + nw * life;
+      const a = pa * ret * (1 + g) + nw * inp.aum + c * 6000;
+      rev.push((pa + a) / 2 * fee + nw * ann * 50000 * 0.05 + nw * life * 1500 * 0.8 + pi * ret * 1500 * 0.05);
+      pc = c; pi = ins; pa = a; out.newPerYear = nw;
+    }
+    let clv = 0;
+    for (let t = 1; t <= 10; t++) { const s = Math.pow(ret, t - 1);
+      const aum = inp.aum * Math.pow(1 + g, t) + 6000 * (Math.pow(1 + g, t) - 1) / g;
+      let cf = s * fee * aum + (t === 1 ? ann * 50000 * 0.05 + life * 1500 * 0.8 : s * life * 1500 * 0.05);
+      clv += cf / Math.pow(1.08, t); }
+    return { rev, aum3: pa, clients3: pc, clv, newPerYear: out.newPerYear };
+  }
+  function renderRoi() {
+    const pf = portfolio();
+    const inp = { pros: +$("p-pros").value, aum: +$("p-aum").value, g: pf.ret + FEE };
+    const cost = +$("p-cost").value;
+    const st = roiRun(+$("p-conv").value, +$("p-retn").value, 0.20, 0.25, inp);
+    const dd = roiRun(+$("p-convd").value, +$("p-retd").value, 0.25, 0.30, inp);
+    const sum = a => a.reduce((x, y) => x + y, 0), up = sum(dd.rev) - sum(st.rev);
+    $("k-up").textContent = (up >= 0 ? "+" : "") + short(up);
+    $("k-up-s").textContent = `${short(sum(st.rev))} → ${short(sum(dd.rev))}`;
+    $("k-y1").textContent = short(dd.rev[0] - cost);
+    $("k-y1-s").textContent = `data-driven; standard ${short(st.rev[0] - cost)}`;
+    $("k-aumx").textContent = (dd.aum3 - st.aum3 >= 0 ? "+" : "") + short(dd.aum3 - st.aum3);
+    $("k-clv").textContent = short(dd.clv);
+    $("k-clv-s").textContent = `per client, vs ${short(st.clv)} standard`;
+    const y1s = st.rev[0] >= cost, y1d = dd.rev[0] >= cost;
+    $("t-roi").innerHTML = `<strong>${up >= 0 ? "+" + short(up) : short(up)} over three years</strong> from the same prospects. `
+      + (y1d && !y1s ? "The data-driven planner covers their cost in year 1; the standard approach doesn't until year 2. "
+         : y1d ? "Both approaches cover the planner's cost in year 1. " : "Neither approach covers the planner's cost in year 1 at these inputs. ")
+      + "The gain comes from clients who see a clear reason to act, and stay because they understand their plan.";
+    makeChart("c-roi", { data: { labels: ["Year 1", "Year 2", "Year 3"], datasets: [
+      { type: "bar", label: "Standard", data: st.rev, backgroundColor: css("--muted"), borderRadius: 4, barPercentage: .8, categoryPercentage: .6, order: 2 },
+      { type: "bar", label: "Data-driven", data: dd.rev, backgroundColor: css("--series-1"), borderRadius: 4, barPercentage: .8, categoryPercentage: .6, order: 2 },
+      { type: "line", label: "Planner cost", data: [cost, cost, cost], borderColor: css("--ink"), borderDash: [5, 4], borderWidth: 1.5, pointRadius: 0, order: 1 }
+    ] }, options: (() => { const o = baseOpts(short); o.scales.y.beginAtZero = true; return o; })() });
+  }
+
   // ---------- wiring
   const yrs = v => v, usd = v => money(v), p0 = v => pct(v), sgn = v => (v > 0 ? "+" : "") + pct(v);
   bind(["r-age", "r-ret", "r-sav", "r-con", "r-spend", "r-ss", "r-tips"], [yrs, yrs, usd, usd, usd, usd, p0], renderRet);
   $("r-port").addEventListener("change", renderRet);
   bind(["a-amt", "a-tnow", "a-tret", "a-sal"], [usd, p0, p0, usd], renderAcc);
   bind(["b-cash", "b-price", "b-fixed", "b-grow", "b-churn"], [usd, sgn, sgn, p0, p0], renderBus);
+  bind(["p-pros", "p-conv", "p-convd", "p-retn", "p-retd", "p-aum", "p-cost"], [yrs, p0, p0, p0, p0, usd, usd], renderRoi);
 
   const tabs = [...document.querySelectorAll('[role="tab"]')];
   function select(id, push) {
@@ -399,8 +474,8 @@ footer { margin-top: 32px; font-size: 12px; color: var(--muted); max-width: 80ch
   }
   tabs.forEach(t => t.addEventListener("click", () => select(t.getAttribute("aria-controls"), true)));
   let start = (location.hash || "").slice(1);
-  if (!["retirement", "accounts", "business", "about"].includes(start)) { try { start = localStorage.getItem("planner-tab") || "retirement"; } catch (e) { start = "retirement"; } }
-  if (!["retirement", "accounts", "business", "about"].includes(start)) start = "retirement";
+  if (!["retirement", "accounts", "business", "roi", "about"].includes(start)) { try { start = localStorage.getItem("planner-tab") || "retirement"; } catch (e) { start = "retirement"; } }
+  if (!["retirement", "accounts", "business", "roi", "about"].includes(start)) start = "retirement";
 
   function renderAll() { if (!window.Chart) return; chartDefaults(); renderRet(); renderBus(); }
   select(start, false);
